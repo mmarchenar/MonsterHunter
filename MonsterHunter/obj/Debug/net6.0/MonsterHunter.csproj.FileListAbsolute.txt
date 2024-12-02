@@ -1,0 +1,14 @@
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\bin\Debug\net6.0\MonsterHunter.exe
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\bin\Debug\net6.0\MonsterHunter.deps.json
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\bin\Debug\net6.0\MonsterHunter.runtimeconfig.json
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\bin\Debug\net6.0\MonsterHunter.dll
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\bin\Debug\net6.0\MonsterHunter.pdb
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.AssemblyInfoInputs.cache
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.AssemblyInfo.cs
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.csproj.CoreCompileInputs.cache
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.dll
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\refint\MonsterHunter.dll
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.pdb
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\MonsterHunter.genruntimeconfig.cache
+C:\Users\RYZEN\source\repos\MonsterHunter\MonsterHunter\obj\Debug\net6.0\ref\MonsterHunter.dll
