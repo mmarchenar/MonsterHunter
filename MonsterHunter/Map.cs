@@ -12,6 +12,8 @@ namespace MonsterHunter
         public int Height { get; private set; }
         public string[] AvailableMaps { get; private set; }
         public char[,] MapData { get; private set; }
+        public int scoreHunter { get; private set; }
+        public Hunter currentHunter { get; private set; }
 
         public Map()
         {
@@ -24,7 +26,7 @@ namespace MonsterHunter
             string[] AvailableMaps = {"map1","map2","map3"};
         }
 
-        public void LoadMap(string mapFile, Hunter hunter, Monsters monsters)
+        public void LoadMap(string mapFile, Monsters monsters, String name)
         {
             string[] lines = File.ReadAllLines(mapFile);
             Height = lines.Length;
@@ -41,20 +43,22 @@ namespace MonsterHunter
                     // Find the Hunter's starting position
                     if (MapData[y, x] == 'H')
                     {
-                        hunter.X = x;
-                        hunter.Y = y;
-                        MapData[y, x] = '#';  // Remove hunter from map
+                        Hunter hunter = new Hunter(x, y, name, this);
+                        this.currentHunter = hunter;
+                        MapData[y, x] = ' ';  // Remove hunter from map
                     }
 
                     // Add Monsters
                     if (MapData[y, x] == 'M')
                     {
                         monsters.AddMonster(new Monster(x, y));
-                        MapData[y, x] = '#';  // Remove monster from map
+                        MapData[y, x] = ' ';  // Remove monster from map
                     }
                 }
             }
         }
+
+        
     }
 
 }

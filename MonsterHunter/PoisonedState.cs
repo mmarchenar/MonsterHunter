@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MonsterHunter
 {
-    public class InvisibleState : IState
+    public class PoisonedState : IState
     {
         private DateTime _startTime;
 
-        public InvisibleState(Hunter hunter)
+        public PoisonedState(Hunter hunter)
         {
             _startTime = DateTime.Now;
             ApplyState(hunter);
@@ -18,10 +18,14 @@ namespace MonsterHunter
 
         public void ApplyState(Hunter hunter)
         {
-            hunter.isInvisible = true;
+            // Reducir fuerza y defensa
+            hunter.Strength = hunter.Strength/2;  // Half attack
+            hunter.Armor = hunter.Armor/2;     // Half defense
+            hunter.CurrentHP -= 5;
+            hunter.FreezeTime += (int)(hunter.FreezeTime*0.25);   // Increase freeze time
             expired(hunter);
         }
-        bool isExpired=false;
+        bool isExpired = false;
         public async Task expired(Hunter hunter)
         {
             while (!isExpired)
@@ -29,8 +33,11 @@ namespace MonsterHunter
                 if (HasExpired())
                 {
                     isExpired = true;
-                    Console.WriteLine($"Your Invisible state expired");
-                    hunter.isInvisible = false;
+                    Console.WriteLine($"Your Poisoned state expired");
+                    hunter.Strength= hunter.Strength*2 ;
+                    hunter.Armor = hunter.Armor*2 ;
+                    hunter.FreezeTime -= (int)(hunter.FreezeTime * 0.25);
+                    hunter.State = new NormalState();
                 }
                 await Task.Delay(1000);
             }
@@ -42,5 +49,4 @@ namespace MonsterHunter
             return DateTime.Now.Subtract(_startTime).TotalSeconds > 10;
         }
     }
-
 }

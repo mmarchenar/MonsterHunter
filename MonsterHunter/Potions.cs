@@ -9,7 +9,7 @@ namespace MonsterHunter
     public enum PotionType
     {
         Strength,
-        Poisoned,
+        Poison,
         Invisibility,
         Speed
     }
@@ -22,7 +22,7 @@ namespace MonsterHunter
             int roll = Random.Instance.Next(1, 7);
             Type = roll switch
             {
-                1 => PotionType.Poisoned,
+                1 => PotionType.Poison,
                 2 or 3 => PotionType.Speed,
                 4 or 5 => PotionType.Invisibility,
                 _ => PotionType.Strength

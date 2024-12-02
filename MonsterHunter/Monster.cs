@@ -21,10 +21,45 @@ namespace MonsterHunter
 
         public override bool Move(int newX, int newY, Map map)
         {
-            // Add monster movement logic here
-            X = newX;
-            Y = newY;
+            Hunter hunter1 = map.currentHunter;
+            if (map.MapData[newX, newY] == '#')
+            {
+            } else if (hunter1.X == newX && hunter1.Y == newY)
+            {
+                attack(hunter1);
+            }
+            else
+            {
+                this.X = newX;
+                this.Y = newY;
+
+            }
             return true;
+        }
+
+        public void attack(Hunter target)
+        {
+            int hit = this.Strength - target.Armor;
+            target.CurrentHP -= hit;
+            Console.WriteLine($"You dealt {hit} damage");
+            if (target.shieldH.BreakAfterAttack())
+            {
+                target.Armor -= target.shieldH.Armor;
+                target.shieldH = null;
+                Console.WriteLine("Your sword broke!!");
+            }
+            if (target.IsDead())
+            {
+                target = null;
+                Console.WriteLine("You died :(");
+            }
+
+
+            
+
+
+
+
         }
     }
 

@@ -8,16 +8,16 @@ namespace MonsterHunter
 {
     public class Monsters
     {
-        private List<Monster> _monsters = new List<Monster>();
+        private static List<Monster> _monsters = new List<Monster>();
 
-        public void AddMonster(Monster monster)
+        public void  AddMonster(Monster monster)
         {
             _monsters.Add(monster);
         }
 
-        public List<Monster> FindMonstersAtPosition(int x, int y)
+        public static Monster[] FindMonstersAtPosition(int x, int y)
         {
-            return _monsters.Where(m => m.X == x && m.Y == y).ToList();
+            return _monsters.Where(m => m.X == x && m.Y == y).ToArray();
         }
     }
 

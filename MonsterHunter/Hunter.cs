@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,117 +12,162 @@ namespace MonsterHunter
         public string Name { get; set; }
         public int Score { get; set; }
         public IState State { get; set; }
-
-        public Hunter(int x, int y, string name) : base(x,y)
+        private Pickaxe pickaxeH { get; set; }
+        private Sword swordH { get; set; }
+        private Potions potionsH { get; set; }
+        public Shield shieldH {get; set; }
+        public bool isInvisible {get;set;}
+        public Map currentMap { get; set;}
+        public Hunter(int x, int y, string name, Map map) : base(x,y)
         {
             X = x;
             Y = y;
+            Score = 0;
             Name = name;
             MaxHP = 30;
             CurrentHP = MaxHP;
-            picaxe = null;
-            sword = null;
-            shield = null;
+            pickaxeH = null;
+            swordH = null;
+            shieldH = null;
+            isInvisible = false;
             Strength = 7;
             Armor = 4;
             FreezeTime = 1000; // Default freeze time 1 second
             State = new NormalState();  // Default state
         }
-        
+
+       
         public override bool Move(int newX, int newY, Map map)
         {
-            if (map.MapData[newX, newY] == ' ')
+            Monster[] target = Monsters.FindMonstersAtPosition(newX, newY);
+            if (target != null)
+            {
+                foreach (Monster monster in target)
+                {
+                    attack(monster);
+                }
+            }
+            else if (map.MapData[newX, newY] == '#')  
+            {
+                if (isInvisible == false)
+                {
+                    if (hasPickaxe())
+                    {
+                        breakWall(map, newX, newY);
+                    }
+                    else
+                    {
+                        Console.WriteLine("You don't have a pickaxe to break the wall");
+                        return false;
+                    }
+                }
+                else
+                {
+
+                }
+            } 
+            else if ((map.MapData[newX, newY] == 'h') || (map.MapData[newX, newY] == 'w') || (map.MapData[newX, newY] == 'p') || (map.MapData[newX, newY] == 'x'))
+            {
+                AddToInventory(map.MapData[newX, newY]);
+            }
+            else
             {
                 X = newX;
                 Y = newY;
             }
-            else if (map.MapData[newX, newY] == '#')  // Si el Hunter intenta mover hacia una pared
-            {
-                // Verificar si tiene un pico en el inventario para romper la pared
-                BreakWall(map, newX, newY);
-            }
-            else if ((map.MapData[newX, newY] == 'h') || (map.MapData[newX, newY] == 'w') || (map.MapData[newX, newY] == 'p') || (map.MapData[newX, newY] == 'x'))
-            {
-                AddToInventory(map.MapData[newX, newY]);
-
-                // Si el objeto es recogido, lo eliminamos del mapa (por ejemplo, reemplazándolo con un espacio vacío)
-                map.MapData[newX, newY] = ' ';
-
-            }
             return true;
         }
-
-
+        
         private void AddToInventory(char item)
         {
-            Object itemObject = null;
             switch (item)
             {
                 case 'x':
-                    Pickaxe pickaxe = new Pickaxe(); break;
+                    Pickaxe pickaxe = new Pickaxe(); 
+                    pickaxeH = pickaxe;
+                    Score += 50;
+                    Console.WriteLine("You picked up a pickaxe!");
+                    break;
                 case 'w':
-                    Sword sword = new Sword(); break;
+                    if (swordH != null) { this.Strength -= swordH.Strength; }
+                    Sword sword = new Sword();
+                    swordH = sword;
+                    this.Strength += sword.Strength;
+                    Score += 50;
+                    Console.WriteLine("You picked up a Sword: +"+ sword.Strength+" Strength!");  break;
                 case 'h':
-                    Shield shield = new Shield(); break;
+                    if (shieldH != null) { this.Armor -= shieldH.Armor; }
+                    Shield shield = new Shield(); 
+                    shieldH = shield;
+                    this.Armor += shield.Armor;
+                    Score += 50;
+                    Console.WriteLine("You picked up a Sword: +" + shield.Armor + " Defense!"); break;
                 case 'p':
-                    Potions potion = new Potions(); break;
+                    Potions potion = new Potions();
+                    this.drinkPotion(potion);
+                    Score += 25; break;
 
             }
-            for (int i = 0; i < inventory.Length; i++)
-            {
 
-
-                if (inventory[i] ==null)  // Si el espacio está vacío
-                {
-                    inventory[i] = item;  // Añadir el objeto al inventario
-                    Console.WriteLine($"Objeto '{item}' añadido al inventario.");
-                    return;
-                }
-            }
-            Console.WriteLine("Inventario lleno. No se puede añadir más objetos.");
         }
-        private bool HasPickaxe()
+
+        private bool hasPickaxe()
         {
-            for (int i = 0; i < inventory.Length; i++)
-            {
-                if (inventory[i] == 'x') // 'x' representa el pico
-                {
-                    return true;
-                }
-            }
+            if (this.pickaxeH != null) { return true; }
+
             return false;
         }
-        private void BreakWall(Map map, int newX, int newY)
+        private void breakWall(Map map, int newX, int newY)
         {
-            if (HasPickaxe())
-            {
-                map.MapData[newX, newY] = ' ';  // Rompe la pared cambiando el carácter a un espacio
-                Console.WriteLine("Pared rota con el pico!");
-            }
-            else
-            {
-                Console.WriteLine("No tienes un pico para romper la pared.");
-            }
+
+                if (this.pickaxeH.BreakAfterUse()) {
+                    this.pickaxeH = null;
+                    Console.WriteLine("Your pickaxe broke!");
+                }
+                Console.WriteLine("Wall broken!");
+            
         }
-        public void DrinkPotion(Potions potion)
+        public void drinkPotion(Potions potion)
         {
             // Modify state based on the potion type
             switch (potion.Type)
             {
                 case PotionType.Strength:
-                    State = new StrongState();
+                    State = new StrongState(this);
                     break;
-                case PotionType.Poisoned:
-                    State = new PoisonedState();
+                case PotionType.Poison:
+                    State = new PoisonedState(this);
                     break;
                 case PotionType.Invisibility:
-                    State = new InvisibleState();
+                    State = new InvisibleState(this);
                     break;
                 case PotionType.Speed:
-                    State = new FastState();
+                    State = new FastState(this);
                     break;
             }
         }
+
+        public void attack(Monster target) {
+            int hit = this.Strength - target.Armor;
+            target.CurrentHP -= hit;
+            Console.WriteLine($"You dealt {hit} damage");
+            if (this.swordH.BreakAfterAttack())
+            {
+                this.Strength -= swordH.Strength;
+                this.swordH = null;
+                Console.WriteLine("Your sword broke!!");
+            }
+            if (target.IsDead())
+            {
+                target = null;
+                this.Score += 100;
+                Console.WriteLine("The monster died!!");
+            }
+
+        }
+        
+
+
     }
 
 }
