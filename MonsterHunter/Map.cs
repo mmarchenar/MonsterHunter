@@ -22,13 +22,41 @@ namespace MonsterHunter
 
         private void LoadAvailableMaps()
         {
-            // Load .map files from the current directory
-            string[] AvailableMaps = {"map1","map2","map3"};
-        }
+            string mapsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Maps"); // Carpeta 'Maps' en el directorio actual
 
-        public void LoadMap(string mapFile, Monsters monsters, String name)
+            if (Directory.Exists(mapsDirectory))
+            {
+                // Buscar todos los archivos que terminen en '.txt' dentro de la carpeta 'Maps'
+                AvailableMaps = Directory.GetFiles(mapsDirectory, "*.txt")
+                                         .Select(file => Path.GetFileNameWithoutExtension(file))  // Solo tomar el nombre del archivo sin la extensión
+                                         .ToArray();
+
+                Console.WriteLine("Mapas disponibles:");
+                foreach (var map in AvailableMaps)
+                {
+                    Console.WriteLine(map); // Mostrar los mapas encontrados en la consola
+                }
+            }
+            else
+            {
+                Console.WriteLine("La carpeta 'Maps' no existe en el directorio.");
+                AvailableMaps = new string[0]; // Si no existe la carpeta, dejar la lista vacía
+            }
+        }
+        public void LoadMap(string mapName, Monsters monsters, string name)
         {
-            string[] lines = File.ReadAllLines(mapFile);
+            // Verificar que el mapa solicitado esté en los mapas disponibles
+            if (!AvailableMaps.Contains(mapName))
+            {
+                Console.WriteLine($"El mapa '{mapName}' no está disponible.");
+                return;
+            }
+
+            // Construir la ruta completa al archivo del mapa
+            string mapFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Maps", mapName + ".txt");
+
+            // Leer el mapa desde el archivo
+            string[] lines = File.ReadAllLines(mapFilePath);
             Height = lines.Length;
             Width = lines.Max(line => line.Length);
 
@@ -40,25 +68,23 @@ namespace MonsterHunter
                 {
                     MapData[y, x] = lines[y][x];
 
-                    // Find the Hunter's starting position
+                    // Encontrar la posición inicial del cazador
                     if (MapData[y, x] == 'H')
                     {
-                        Hunter hunter = new Hunter(x, y, name, this);
-                        this.currentHunter = hunter;
-                        MapData[y, x] = ' ';  // Remove hunter from map
+                        currentHunter = new Hunter(x, y, name, this); // No necesitas 'this' aquí
+                        MapData[y, x] = ' ';  // Quitar al cazador del mapa
                     }
 
-                    // Add Monsters
+                    // Añadir monstruos
                     if (MapData[y, x] == 'M')
                     {
                         monsters.AddMonster(new Monster(x, y));
-                        MapData[y, x] = ' ';  // Remove monster from map
+                        MapData[y, x] = ' ';  // Quitar el monstruo del mapa
                     }
                 }
             }
         }
 
-        
     }
 
 }
