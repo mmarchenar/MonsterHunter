@@ -19,7 +19,9 @@ namespace MonsterHunter
             Name = name;
             MaxHP = 30;
             CurrentHP = MaxHP;
-            inventory = new Object[4];
+            picaxe = null;
+            sword = null;
+            shield = null;
             Strength = 7;
             Armor = 4;
             FreezeTime = 1000; // Default freeze time 1 second
