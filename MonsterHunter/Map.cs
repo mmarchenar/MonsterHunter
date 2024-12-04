@@ -4,87 +4,85 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MonsterHunter
+namespace MonsterHunter  // Define a namespace for the MonsterHunter project
 {
-    public class Map
+    public class Map  // Define the Map class to represent the game map
     {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public string[] AvailableMaps { get; private set; }
-        public char[,] MapData { get; private set; }
-        public int scoreHunter { get; private set; }
-        public Hunter currentHunter { get; private set; }
+        public int Width { get; private set; }  // Property to store the width of the map
+        public int Height { get; private set; }  // Property to store the height of the map
+        public string[] AvailableMaps { get; private set; }  // Array to hold names of available maps
+        public char[,] MapData { get; private set; }  // 2D array to store the map data (characters representing terrain, etc.)
+        public int scoreHunter { get; private set; }  // Property to track the hunter's score
+        public Hunter currentHunter { get; private set; }  // Property to store the current hunter instance
 
-        public Map()
+        public Map()  // Constructor for the Map class
         {
-            LoadAvailableMaps();
+            LoadAvailableMaps();  // Call method to load available maps from the directory
         }
 
-        private void LoadAvailableMaps()
+        private void LoadAvailableMaps()  // Method to load available maps from a specified directory
         {
-            string mapsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Maps"); // Carpeta 'Maps' en el directorio actual
+            string mapsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Maps");  // Define path to 'Maps' directory in current directory
 
-            if (Directory.Exists(mapsDirectory))
+            if (Directory.Exists(mapsDirectory))  // Check if the 'Maps' directory exists
             {
-                // Buscar todos los archivos que terminen en '.txt' dentro de la carpeta 'Maps'
+                // Find all files that end with '.txt' in the 'Maps' folder
                 AvailableMaps = Directory.GetFiles(mapsDirectory, "*.txt")
-                                         .Select(file => Path.GetFileNameWithoutExtension(file))  // Solo tomar el nombre del archivo sin la extensión
-                                         .ToArray();
+                                         .Select(file => Path.GetFileNameWithoutExtension(file))  // Get only the file names without extensions
+                                         .ToArray();  // Convert result to an array
 
-                Console.WriteLine("Mapas disponibles:");
-                foreach (var map in AvailableMaps)
+                Console.WriteLine("Mapas disponibles:");  // Print header for available maps
+                foreach (var map in AvailableMaps)  // Iterate through each available map
                 {
-                    Console.WriteLine(map); // Mostrar los mapas encontrados en la consola
+                    Console.WriteLine(map);  // Print the name of each available map
                 }
             }
-            else
+            else  // If the 'Maps' directory does not exist
             {
-                Console.WriteLine("La carpeta 'Maps' no existe en el directorio.");
-                AvailableMaps = new string[0]; // Si no existe la carpeta, dejar la lista vacía
+                Console.WriteLine("La carpeta 'Maps' no existe en el directorio.");  // Notify that the directory is missing
+                AvailableMaps = new string[0];  // Initialize AvailableMaps as an empty array
             }
         }
-        public void LoadMap(string mapName, Monsters monsters, string name)
+
+        public void LoadMap(string mapName, Monsters monsters, string name)  // Method to load a specific map by name and initialize monsters and hunter
         {
-            // Verificar que el mapa solicitado esté en los mapas disponibles
-            if (!AvailableMaps.Contains(mapName))
+            if (!AvailableMaps.Contains(mapName))  // Check if the specified map is available
             {
-                Console.WriteLine($"El mapa '{mapName}' no está disponible.");
-                return;
+                Console.WriteLine($"El mapa '{mapName}' no está disponible.");  // Notify that the map is not available
+                return;  // Exit method if map is not found
             }
 
-            // Construir la ruta completa al archivo del mapa
+            // Build the full path to the map file
             string mapFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Maps", mapName + ".txt");
 
-            // Leer el mapa desde el archivo
+            // Read the map from the file into an array of strings, where each string is a line in the file
             string[] lines = File.ReadAllLines(mapFilePath);
-            Height = lines.Length;
-            Width = lines.Max(line => line.Length);
+            Height = lines.Length;  // Set Height based on number of lines in file
+            Width = lines.Max(line => line.Length);  // Set Width based on length of longest line
 
-            MapData = new char[Height, Width];
+            MapData = new char[Height, Width];  // Initialize MapData as a 2D array with dimensions Height x Width
 
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < Height; y++)  // Loop through each row of the map data
             {
-                for (int x = 0; x < lines[y].Length; x++)
+                for (int x = 0; x < lines[y].Length; x++)  // Loop through each character in the current row
                 {
-                    MapData[y, x] = lines[y][x];
+                    MapData[y, x] = lines[y][x];  // Store character in MapData at corresponding position
 
-                    // Encontrar la posición inicial del cazador
+                    // Find initial position of the hunter represented by 'H'
                     if (MapData[y, x] == 'H')
                     {
-                        currentHunter = new Hunter(x, y, name, this); // No necesitas 'this' aquí
-                        MapData[y, x] = ' ';  // Quitar al cazador del mapa
+                        currentHunter = new Hunter(x, y, name, this);  // Create a new Hunter instance at position (x, y)
+                        MapData[y, x] = ' ';  // Remove hunter from map representation by replacing with space character
                     }
 
-                    // Añadir monstruos
+                    // Add monsters represented by 'M'
                     if (MapData[y, x] == 'M')
                     {
-                        monsters.AddMonster(new Monster(x, y));
-                        MapData[y, x] = ' ';  // Quitar el monstruo del mapa
+                        monsters.AddMonster(new Monster(x, y));  // Create and add a new Monster instance at position (x, y)
+                        MapData[y, x] = ' ';  // Remove monster from map representation by replacing with space character
                     }
                 }
             }
         }
-
     }
-
 }
