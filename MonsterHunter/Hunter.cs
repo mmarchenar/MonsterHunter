@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace MonsterHunter
 {
@@ -46,11 +47,19 @@ namespace MonsterHunter
         {
             // Check if there are monsters at the new position
             Monster[] target = Monsters.FindMonstersAtPosition(newX, newY);
-            if (target != null)  // If there are monsters, attack them
+            if (target.Length > 0)  // If there are monsters, attack them
             {
-                foreach (Monster monster in target)
+                if (!isInvisible)
                 {
-                    attack(monster);
+                    foreach (Monster monster in target)
+                    {
+                        attack(monster, map);
+                    }
+                }
+                else
+                {
+                    this.X = newX;
+                    this.Y = newY;
                 }
             }
             // If the position is a wall, try to break it if the Hunter has a pickaxe
@@ -64,32 +73,36 @@ namespace MonsterHunter
                     }
                     else
                     {
-                        Console.WriteLine("You don't have a pickaxe to break the wall.");
+                        map.info.Add("You don't have a pickaxe to break the wall.");
                         return false;
                     }
                 }
                 else
                 {
-                    // Do nothing if invisible (can be expanded if needed)
+                    this.X = newX;
+                    this.Y = newY;
                 }
             }
             // If the position has an item (e.g., pickaxe, sword), add it to the inventory
             else if ((map.MapData[newX, newY] == 'h') || (map.MapData[newX, newY] == 'w') ||
                      (map.MapData[newX, newY] == 'p') || (map.MapData[newX, newY] == 'x'))
             {
-                AddToInventory(map.MapData[newX, newY]);
+                AddToInventory(map.MapData[newX, newY], map);
+                map.MapData[newX, newY] = ' ';
             }
             // Otherwise, simply move to the new position
-            else
+            else if (map.MapData[newX, newY] == ' ')
             {
-                X = newX;
-                Y = newY;
+                this.X = newX;
+                this.Y = newY;
+
+                return true;
             }
-            return true;
+            return false;
         }
 
         // Adds items to the Hunter's inventory and updates score
-        private void AddToInventory(char item)
+        private void AddToInventory(char item, Map map)
         {
             switch (item)
             {
@@ -97,7 +110,7 @@ namespace MonsterHunter
                     Pickaxe pickaxe = new Pickaxe();
                     pickaxeH = pickaxe;
                     Score += 50;   // Increase score when picking up an item
-                    Console.WriteLine("You picked up a pickaxe!");
+                    map.info.Add("You picked up a pickaxe!");
                     break;
                 case 'w':   // Sword
                     if (swordH != null) { this.Strength -= swordH.Strength; }  // Remove the previous sword's strength
@@ -105,7 +118,7 @@ namespace MonsterHunter
                     swordH = sword;
                     this.Strength += sword.Strength;  // Add new sword's strength
                     Score += 50;
-                    Console.WriteLine("You picked up a Sword: +" + sword.Strength + " Strength!");
+                    map.info.Add("You picked up a Sword: +" + sword.Strength + " Strength!");
                     break;
                 case 'h':   // Shield
                     if (shieldH != null) { this.Armor -= shieldH.Armor; }  // Remove previous shield's armor
@@ -113,11 +126,11 @@ namespace MonsterHunter
                     shieldH = shield;
                     this.Armor += shield.Armor;  // Add new shield's armor
                     Score += 50;
-                    Console.WriteLine("You picked up a Shield: +" + shield.Armor + " Defense!");
+                    map.info.Add("You picked up a Shield: +" + shield.Armor + " Defense!");
                     break;
                 case 'p':   // Potion
                     Potions potion = new Potions();
-                    this.drinkPotion(potion);  // Drink the potion and change state accordingly
+                    this.drinkPotion(potion, map);  // Drink the potion and change state accordingly
                     Score += 25;
                     break;
             }
@@ -135,53 +148,80 @@ namespace MonsterHunter
             if (this.pickaxeH.BreakAfterUse())  // If the pickaxe breaks after use
             {
                 this.pickaxeH = null;  // Remove pickaxe from inventory
-                Console.WriteLine("Your pickaxe broke!");
+                map.info.Add("Your pickaxe broke!");
             }
-            Console.WriteLine("Wall broken!");
+            map.MapData[newX, newY] = ' ';
+            map.info.Add("Wall broken!");
         }
 
         // Handles drinking a potion and changing the Hunter's state
-        public void drinkPotion(Potions potion)
+        public void drinkPotion(Potions potion, Map map)
         {
             // Change state based on the potion type
             switch (potion.Type)
             {
                 case PotionType.Strength:
-                    State = new StrongState(this);  // Increase strength
+                    State = new StrongState(this, map);  // Increase strength
+                    map.info.Add("You drank a strength potion! Bonus damage, armor and full health!");
                     break;
                 case PotionType.Poison:
-                    State = new PoisonedState(this);  // Apply poison effect
+                    State = new PoisonedState(this, map);  // Apply poison effect
+                    map.info.Add("You drank poison! You recieve damage and struggle to move!");
                     break;
                 case PotionType.Invisibility:
-                    State = new InvisibleState(this);  // Make the Hunter invisible
+                    State = new InvisibleState(this, map);  // Make the Hunter invisible
+                    map.info.Add("You drank an invisibility potion! You can now walk through enemies and walls!");
                     break;
                 case PotionType.Speed:
-                    State = new FastState(this);  // Increase speed
+                    State = new FastState(this, map);  // Increase speed
+                    map.info.Add("You drank a speed potion! You can act faster now!");
                     break;
             }
         }
 
         // Attack a monster and deal damage
-        public void attack(Monster target)
+        public void attack(Monster target, Map map)
         {
             int hit = this.Strength - target.Armor;  // Calculate damage based on strength and monster armor
             target.CurrentHP -= hit;  // Reduce monster's health
-            Console.WriteLine($"You dealt {hit} damage");
+            map.info.Add($"You dealt {hit} damage");
+
+            hit = target.Strength - this.Armor;
+            this.CurrentHP -= hit;  // Apply damage to the hunter
+            map.info.Add($"The monster dealt {hit} damage.");
 
             // If the sword breaks after an attack, remove it
-            if (this.swordH.BreakAfterAttack())
+            if (this.swordH != null)
             {
-                this.Strength -= swordH.Strength;
-                this.swordH = null;
-                Console.WriteLine("Your sword broke!!");
+                if (this.swordH.BreakAfterAttack())
+                {
+                    this.Strength -= swordH.Strength;
+                    Sword broken = new Sword();
+                    broken.Strength = 0;
+                    this.swordH = broken;
+                    map.info.Add("Your sword broke!!");
+                }
+            }
+
+
+            // Check if the hunter's shield breaks after the attack
+            if (this.shieldH != null && this.shieldH.BreakAfterAttack())
+            {
+                // If the shield breaks, reduce the hunter's armor and nullify the shield
+                this.Armor -= this.shieldH.Armor;
+                this.shieldH = null;
+                map.info.Add("Your shield broke!"); // Inform the hunter that the shield broke
             }
 
             // If the monster is dead, remove it and increase the Hunter's score
             if (target.IsDead())
-            {
+            { 
+                target.X = 0;
+                target.Y = 0;
                 target = null;
+                GC.Collect();
                 this.Score += 100;
-                Console.WriteLine("The monster died!!");
+                map.info.Add("The monster died!!");
             }
         }
     }

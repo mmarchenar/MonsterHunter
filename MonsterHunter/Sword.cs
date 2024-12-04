@@ -8,7 +8,7 @@ namespace MonsterHunter  // Define a namespace for the MonsterHunter project
 {
     public class Sword  // Define the Sword class to represent a sword weapon
     {
-        public int Strength { get; private set; }  // Property to store the strength of the sword, accessible only within the class
+        public int Strength { get; set; }  // Property to store the strength of the sword
 
         public Sword()  // Constructor for the Sword class
         {

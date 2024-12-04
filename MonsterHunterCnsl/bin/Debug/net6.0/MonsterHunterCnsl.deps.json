@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "MonsterHunterCnsl/1.0.0": {
+        "dependencies": {
+          "MonsterHunter": "1.0.0"
+        },
+        "runtime": {
+          "MonsterHunterCnsl.dll": {}
+        }
+      },
+      "MonsterHunter/1.0.0": {
+        "runtime": {
+          "MonsterHunter.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MonsterHunterCnsl/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MonsterHunter/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

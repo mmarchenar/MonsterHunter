@@ -14,10 +14,16 @@ namespace MonsterHunter  // Define a namespace for the MonsterHunter project
         public char[,] MapData { get; private set; }  // 2D array to store the map data (characters representing terrain, etc.)
         public int scoreHunter { get; private set; }  // Property to track the hunter's score
         public Hunter currentHunter { get; private set; }  // Property to store the current hunter instance
+        public List<String> info { get;  set; } // Property to store system messages
 
         public Map()  // Constructor for the Map class
         {
             LoadAvailableMaps();  // Call method to load available maps from the directory
+            this.info = new List<String>();
+            this.info.Add(" ");
+            this.info.Add(" ");
+            this.info.Add(" ");
+            this.info.Add(" ");
         }
 
         private void LoadAvailableMaps()  // Method to load available maps from a specified directory
@@ -72,6 +78,7 @@ namespace MonsterHunter  // Define a namespace for the MonsterHunter project
                     if (MapData[y, x] == 'H')
                     {
                         currentHunter = new Hunter(x, y, name, this);  // Create a new Hunter instance at position (x, y)
+                        this.currentHunter = currentHunter;
                         MapData[y, x] = ' ';  // Remove hunter from map representation by replacing with space character
                     }
 

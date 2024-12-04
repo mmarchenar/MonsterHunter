@@ -10,7 +10,7 @@ namespace MonsterHunter
     public class NormalState : IState
     {
         // Applies the normal state to the hunter (no attribute changes)
-        public void ApplyState(Hunter hunter)
+        public void ApplyState(Hunter hunter, Map map)
         {
             // In the normal state, no changes are made to the hunter's attributes.
             // This is the default state where the hunter is not affected by any special conditions.

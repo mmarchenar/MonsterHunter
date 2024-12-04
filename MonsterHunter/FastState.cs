@@ -10,28 +10,28 @@ namespace MonsterHunter  // Define a namespace for the MonsterHunter project
     {
         private DateTime startTime;  // Declare a variable to track when the state started
 
-        public FastState(Hunter hunter)  // Constructor for FastState that takes a Hunter object
+        public FastState(Hunter hunter, Map map)  // Constructor for FastState that takes a Hunter object
         {
             startTime = DateTime.Now;  // Record the current time as the start time of the state
-            ApplyState(hunter);  // Apply the effects of the Fast state to the hunter
+            ApplyState(hunter, map);  // Apply the effects of the Fast state to the hunter
         }
 
         bool isExpired = false;  // Flag to indicate whether the Fast state has expired
 
-        public void ApplyState(Hunter hunter)  // Method to apply the Fast state effects to the hunter
+        public void ApplyState(Hunter hunter,Map map)  // Method to apply the Fast state effects to the hunter
         {
             hunter.FreezeTime = 500;  // Set the hunter's freeze time to 500 milliseconds (decreased)
-            expired(hunter);  // Call the expired method to start checking for expiration
+            expired(hunter, map);  // Call the expired method to start checking for expiration
         }
 
-        public async Task expired(Hunter hunter)  // Asynchronous method to check if the state has expired
+        public async Task expired(Hunter hunter, Map map)  // Asynchronous method to check if the state has expired
         {
             while (!isExpired)  // Loop until the state is marked as expired
             {
                 if (HasExpired())  // Check if the Fast state has expired
                 {
                     isExpired = true;  // Mark the state as expired
-                    Console.WriteLine($"Your Fast state expired");  // Notify that the Fast state has expired
+                    map.info.Add("Your Fast state expired");  // Notify that the Fast state has expired
                     hunter.FreezeTime = 1000;  // Reset the hunter's freeze time back to normal (1000 milliseconds)
                     hunter.State = new NormalState();  // Change the hunter's state to NormalState
                 }

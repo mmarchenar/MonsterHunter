@@ -12,30 +12,30 @@ namespace MonsterHunter
         private DateTime _startTime;
 
         // Constructor that applies the invisible state to the hunter and tracks the start time
-        public InvisibleState(Hunter hunter)
+        public InvisibleState(Hunter hunter, Map map)
         {
             _startTime = DateTime.Now;  // Record the start time
-            ApplyState(hunter);         // Apply the invisible state to the hunter
+            ApplyState(hunter,map);         // Apply the invisible state to the hunter
         }
 
         // Apply the invisible state to the hunter
-        public void ApplyState(Hunter hunter)
+        public void ApplyState(Hunter hunter, Map map)
         {
             hunter.isInvisible = true;  // Set the hunter's invisibility status to true
-            expired(hunter);            // Start checking if the state has expired
+            expired(hunter, map);            // Start checking if the state has expired
         }
 
         bool isExpired = false; // Flag to track if the state has expired
 
         // Asynchronous method to check if the invisible state has expired
-        public async Task expired(Hunter hunter)
+        public async Task expired(Hunter hunter, Map map)
         {
             while (!isExpired)  // Keep checking until the state expires
             {
                 if (HasExpired())  // Check if the state has expired
                 {
                     isExpired = true;  // Mark the state as expired
-                    Console.WriteLine($"Your Invisible state expired");  // Inform the player
+                    map.info.Add($"Your Invisible state expired");  // Inform the player
                     hunter.isInvisible = false;  // Set hunter's invisibility to false
                 }
                 await Task.Delay(1000);  // Wait for 1 second before checking again

@@ -11,7 +11,7 @@ namespace MonsterHunter
     {
         // Method to apply the state to the given hunter
         // This will modify the hunter's properties or behavior based on the state
-        void ApplyState(Hunter hunter);
+        void ApplyState(Hunter hunter, Map map);
 
         // Method to check if the state has expired
         // Returns a boolean indicating whether the state has lasted long enough

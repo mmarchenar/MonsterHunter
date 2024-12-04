@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34018.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonsterHunter", "MonsterHunter\MonsterHunter.csproj", "{C64B6DF6-6AFE-4816-83D3-BA25B05B6028}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonsterHunterCnsl", "MonsterHunterCnsl\MonsterHunterCnsl.csproj", "{D934F957-DFB9-4B3B-977E-8CB229F44484}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C64B6DF6-6AFE-4816-83D3-BA25B05B6028}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C64B6DF6-6AFE-4816-83D3-BA25B05B6028}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C64B6DF6-6AFE-4816-83D3-BA25B05B6028}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

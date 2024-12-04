@@ -10,32 +10,32 @@ namespace MonsterHunter  // Define a namespace for the MonsterHunter project
     {
         private DateTime _startTime;  // Variable to track when the Poisoned state started
 
-        public PoisonedState(Hunter hunter)  // Constructor for PoisonedState that takes a Hunter object
+        public PoisonedState(Hunter hunter, Map map)  // Constructor for PoisonedState that takes a Hunter object
         {
             _startTime = DateTime.Now;  // Record the current time as the start time of the state
-            ApplyState(hunter);  // Apply the effects of the Poisoned state to the hunter
+            ApplyState(hunter, map);  // Apply the effects of the Poisoned state to the hunter
         }
 
-        public void ApplyState(Hunter hunter)  // Method to apply the effects of the Poisoned state to the hunter
+        public void ApplyState(Hunter hunter, Map map)  // Method to apply the effects of the Poisoned state to the hunter
         {
             // Reduce strength and defense
             hunter.Strength = hunter.Strength / 2;  // Halve the hunter's attack strength
             hunter.Armor = hunter.Armor / 2;  // Halve the hunter's armor (defense)
             hunter.CurrentHP -= 5;  // Decrease the hunter's current health by 5 points
             hunter.FreezeTime += (int)(hunter.FreezeTime * 0.25);  // Increase freeze time by 25%
-            expired(hunter);  // Call the expired method to start checking for expiration
+            expired(hunter, map);  // Call the expired method to start checking for expiration
         }
 
         bool isExpired = false;  // Flag to indicate whether the Poisoned state has expired
 
-        public async Task expired(Hunter hunter)  // Asynchronous method to check if the state has expired
+        public async Task expired(Hunter hunter, Map map)  // Asynchronous method to check if the state has expired
         {
             while (!isExpired)  // Loop until the state is marked as expired
             {
                 if (HasExpired())  // Check if the Poisoned state has expired
                 {
                     isExpired = true;  // Mark the state as expired
-                    Console.WriteLine($"Your Poisoned state expired");  // Notify that the Poisoned state has expired
+                    map.info.Add($"Your Poisoned state expired");  // Notify that the Poisoned state has expired
                     hunter.Strength = hunter.Strength * 2;  // Reset the hunter's strength back to normal (double it)
                     hunter.Armor = hunter.Armor * 2;  // Reset the hunter's armor back to normal (double it)
                     hunter.FreezeTime -= (int)(hunter.FreezeTime * 0.25);  // Decrease freeze time by 25% to revert back
