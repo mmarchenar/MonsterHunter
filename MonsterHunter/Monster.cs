@@ -57,6 +57,7 @@
         {
             // Calculate damage dealt to the hunter (based on monster's strength and hunter's armor)
             int hit = this.Strength - target.Armor;
+            if (hit < 0) { hit = 0; } // If Armor > Strenght, Deal 0 damage
             target.CurrentHP -= hit;  // Apply damage to the hunter
             map.info.Add($"The monster dealt {hit} damage.");
 

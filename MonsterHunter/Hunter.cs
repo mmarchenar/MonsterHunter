@@ -37,7 +37,7 @@ namespace MonsterHunter
             shieldH = null;
             isInvisible = false;   // Hunter is not invisible by default
             Strength = 7;   // Default strength of the Hunter
-            Armor = 4;  // Default armor of the Hunter
+            Armor = 1;  // Default armor of the Hunter
             FreezeTime = 1000;  // Default freeze time of 1 second
             State = new NormalState();  // The Hunter starts in a normal state
             Levelup = false;
@@ -74,6 +74,8 @@ namespace MonsterHunter
                     }
                     else
                     {
+
+                        Debug.WriteLine($"You are facing a wall");
                         map.info.Add("You don't have a pickaxe to break the wall.");
                         return false;
                     }
@@ -103,6 +105,7 @@ namespace MonsterHunter
             {
                 this.X = newX;
                 this.Y = newY;
+                Debug.WriteLine($"You are facing nothing");
 
                 return true;
             } 
@@ -191,10 +194,12 @@ namespace MonsterHunter
         public void attack(Monster target, Map map)
         {
             int hit = this.Strength - target.Armor;  // Calculate damage based on strength and monster armor
+            if (hit < 0) { hit = 0; }// If Armor > Strenght, Deal 0 damage
             target.CurrentHP -= hit;  // Reduce monster's health
             map.info.Add($"You dealt {hit} damage");
 
             hit = target.Strength - this.Armor;
+            if (hit < 0) { hit = 0; }// If Armor > Strenght, Receive 0 damage
             this.CurrentHP -= hit;  // Apply damage to the hunter
             map.info.Add($"The monster dealt {hit} damage.");
 

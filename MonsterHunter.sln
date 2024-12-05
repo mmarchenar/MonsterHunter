@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonsterHunter", "MonsterHun
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonsterHunterCnsl", "MonsterHunterCnsl\MonsterHunterCnsl.csproj", "{D934F957-DFB9-4B3B-977E-8CB229F44484}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonsterHunterFrm", "MonsterHunterFrm\MonsterHunterFrm.csproj", "{35282D11-E77C-43F7-AC71-8AEC7445D42F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D934F957-DFB9-4B3B-977E-8CB229F44484}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35282D11-E77C-43F7-AC71-8AEC7445D42F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35282D11-E77C-43F7-AC71-8AEC7445D42F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35282D11-E77C-43F7-AC71-8AEC7445D42F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35282D11-E77C-43F7-AC71-8AEC7445D42F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
