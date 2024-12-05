@@ -21,7 +21,7 @@
             Hunter hunter1 = map.currentHunter;
 
             // Ensure the new position is within the bounds of the map
-            if (newX < 0 || newX >= map.Width || newY < 0 || newY >= map.Height)
+            if (newX < 0 || newX >= map.Height || newY < 0 || newY >= map.Width)
             {
                 // If the new position is out of bounds, do not move the monster
                 return false;
@@ -33,7 +33,7 @@
             }
 
             // Check if the monster is trying to move into a wall ('#')
-            if (map.MapData[newY, newX] == '#')
+            if (map.MapData[newX, newY] == '#')
             {
                 // If it's a wall, the monster can't move here
                 return false;

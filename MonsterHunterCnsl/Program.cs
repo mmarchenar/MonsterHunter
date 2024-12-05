@@ -2,187 +2,273 @@
 using System;
 using System.Threading;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 bool GameOver = false;
 int level = 1;
+int monFreezeTime = 2000;
+
+void UpdateLeaderboard(string playerName, int playerScore)
+{
+    try
+    {
+        string filePath = "leaderboard.txt";
+
+        // List to hold player scores
+        List<(string Name, int Score)> scores = new List<(string, int)>();
+
+        // Check if leaderboard file exists and read scores
+        if (File.Exists(filePath))
+        {
+            string[] lines = File.ReadAllLines(filePath);
+            foreach (var line in lines)
+            {
+                var parts = line.Split('|');
+                if (parts.Length == 2 && int.TryParse(parts[1], out int score))
+                {
+                    scores.Add((parts[0], score));
+                }
+            }
+        }
+
+        // Add the new score
+        scores.Add((playerName, playerScore));
+
+        // Sort scores in descending order and keep top 10
+        scores = scores.OrderByDescending(s => s.Score).Take(10).ToList();
+
+        // Write updated scores back to file
+        using (StreamWriter writer = new StreamWriter(filePath))
+        {
+            foreach (var (Name, Score) in scores)
+            {
+                writer.WriteLine($"{Name}|{Score}");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error updating leaderboard: {ex.Message}");
+    }
+}
 
 void StartPlayerMovement(Map map, Hunter hunter)
 {
-    while (!GameOver)
+    try
     {
-        // Check if a key is pressed and move the player accordingly
-        PlayerMove(map, hunter);
-        Thread.Sleep(hunter.FreezeTime); // Delay for freeze time to control player movement speed
+        while (!GameOver)
+        {
+            PlayerMove(map, hunter);
+            Thread.Sleep(hunter.FreezeTime); // Control player movement speed
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in player movement: {ex.Message}");
     }
 }
 
 void PlayerMove(Map map, Hunter hunter)
 {
-    int newX = hunter.X;
-    int newY = hunter.Y;
-
-    // Check if a key is pressed (non-blocking)
-    if (Console.KeyAvailable)
+    try
     {
-        ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true); // Read key without displaying it
+        int newX = hunter.X;
+        int newY = hunter.Y;
 
-        switch (keyInfo.Key)
+        if (Console.KeyAvailable)
         {
-            case ConsoleKey.UpArrow:
-                newY = newY = (newY - 1 >= 0) ? newY - 1 : newY;  // Ensure it doesn't go out of bounds ; 
-                break;
-            case ConsoleKey.DownArrow:
-                newY = (newY + 1 < map.Width) ? newY + 1 : newY;  // Ensure it doesn't go out of bounds
-                break;
-            case ConsoleKey.LeftArrow:
-                newX = (newX - 1 >= 0) ? newX - 1 : newX;  // Ensure it doesn't go out of bounds
-                break;
-            case ConsoleKey.RightArrow:
-                newX = (newX + 1 < map.Height) ? newX + 1 : newX;  // Ensure it doesn't go out of bounds
-                break;
+            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.UpArrow:
+                    newY = (newY - 1 >= 0) ? newY - 1 : newY;
+                    break;
+                case ConsoleKey.DownArrow:
+                    newY = (newY + 1 < map.Width) ? newY + 1 : newY;
+                    break;
+                case ConsoleKey.LeftArrow:
+                    newX = (newX - 1 >= 0) ? newX - 1 : newX;
+                    break;
+                case ConsoleKey.RightArrow:
+                    newX = (newX + 1 < map.Height) ? newX + 1 : newX;
+                    break;
+            }
+
+            hunter.Move(newX, newY, map);
         }
-        // Move the hunter based on the new position
-        hunter.Move(newX, newY, map);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error processing player input: {ex.Message}");
     }
 }
 
 void MonsterMove(Map map, Monsters monsters)
 {
-    Monster[] monList = Monsters._monsters.ToArray();
-    foreach (Monster mon in monList)
+    try
     {
-        int direction = MonsterHunter.Random.Instance.Next(0, 4); // 0 = up, 1 = down, 2 = left, 3 = right
-        int newX = mon.X;
-        int newY = mon.Y;
-        switch (direction)
+        Monster[] monList = Monsters._monsters.ToArray();
+        foreach (Monster mon in monList)
         {
-            case 0: // Move up
-                newY = (newY - 1 >= 0) ? newY - 1 : newY;  // Ensure it doesn't go out of bounds
-                break;
-            case 1: // Move down
-                newY = (newY + 1 < map.Width) ? newY + 1 : newY;  // Ensure it doesn't go out of bounds
-                break;
-            case 2: // Move left
-                newX = (newX - 1 >= 0) ? newX - 1 : newX;  // Ensure it doesn't go out of bounds
-                break;
-            case 3: // Move right
-                newX = (newX + 1 < map.Height) ? newX + 1 : newX;  // Ensure it doesn't go out of bounds
-                break;
+            int direction = MonsterHunter.Random.Instance.Next(0, 4);
+            int newX = mon.X;
+            int newY = mon.Y;
+
+            switch (direction)
+            {
+                case 0:
+                    newY = (newY - 1 >= 0) ? newY - 1 : newY;
+                    break;
+                case 1:
+                    newY = (newY + 1 < map.Width) ? newY + 1 : newY;
+                    break;
+                case 2:
+                    newX = (newX - 1 >= 0) ? newX - 1 : newX;
+                    break;
+                case 3:
+                    newX = (newX + 1 < map.Height) ? newX + 1 : newX;
+                    break;
+            }
+
+            mon.Move(newX, newY, map);
         }
-        mon.Move(newX, newY, map);
-
     }
-
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error moving monsters: {ex.Message}");
+    }
 }
-// Function to run the monster movement in a separate thread
+
 void StartMonsterMovement(Map map, Monsters monsters)
 {
-    // Run the movement in an infinite loop until the game is over
-    while (!GameOver)
+    try
     {
-        MonsterMove(map, monsters); // Move the monsters
-        Thread.Sleep(2000);
+        while (!GameOver)
+        {
+            MonsterMove(map, monsters);
+            Thread.Sleep(monFreezeTime);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in monster movement: {ex.Message}");
     }
 }
-
 
 void DisplayMap(Map map, Hunter hunter, Monsters monsters)
 {
-    for (int y = 0; y < map.Width; y++)
+    try
     {
-        for (int x = 0; x < map.Height; x++)
+        for (int y = 0; y < map.Width; y++)
         {
-            // Display hunter position
-            if (hunter.X == x && hunter.Y == y)
+            for (int x = 0; x < map.Height; x++)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write('H');
+                if (hunter.X == x && hunter.Y == y)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write('H');
+                }
+                else if (Monsters.FindMonstersAtPosition(x, y).Length != 0 && (x != 0 && y != 0))
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write('M');
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(map.MapData[x, y]);
+                }
             }
-            // Display monster position
-            else if (Monsters.FindMonstersAtPosition(x, y).Length != 0)
+            Console.WriteLine();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error displaying map: {ex.Message}");
+    }
+}
+
+try
+{
+    Console.WriteLine("Enter your name: ");
+    string name = Console.ReadLine();
+
+    while (string.IsNullOrEmpty(name) || name.Length > 19)
+    {
+        Console.WriteLine("Invalid name, try again");
+        name = Console.ReadLine();
+    }
+
+    Map map = new Map();
+    Monsters monsters = new Monsters();
+
+    Console.WriteLine("Enter map name: ");
+    string mapChosen = Console.ReadLine();
+
+    while (!map.AvailableMaps.Contains(mapChosen))
+    {
+        Console.WriteLine("Map doesn't exist");
+        mapChosen = Console.ReadLine();
+    }
+
+    map.LoadMap(mapChosen, monsters, name);
+
+    Thread monsterMovementThread = new Thread(() => StartMonsterMovement(map, monsters));
+    Thread playerMovementThread = new Thread(() => StartPlayerMovement(map, map.currentHunter));
+
+    monsterMovementThread.Start();
+    playerMovementThread.Start();
+
+    while (!GameOver)
+    {
+        Thread.Sleep(map.currentHunter.FreezeTime);
+        Console.Clear();
+        Console.WriteLine("=============================================");
+        DisplayMap(map, map.currentHunter, monsters);
+        Console.WriteLine("=============================================");
+        Console.WriteLine($"Player: {name}             Map: {mapChosen}.map\n" +
+                          $"HP:{map.currentHunter.CurrentHP}             Level: {level}\n" +
+                          $"Score: {map.currentHunter.Score}             ");
+        Console.WriteLine("=============================================");
+        Console.WriteLine("Infos:");
+        Console.WriteLine($"{map.info[^3]}\n{map.info[^2]}\n{map.info[^1]}");
+        Console.WriteLine("=============================================");
+
+        if (map.currentHunter.IsDead())
+        {
+            GameOver = true;
+            UpdateLeaderboard(map.currentHunter.Name, map.currentHunter.Score);
+
+            Console.WriteLine("Leaderboard updated:");
+            if (File.Exists("leaderboard.txt"))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write('M');
-            }
-            // Display other map elements
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(map.MapData[x, y]);
+                string[] leaderboard = File.ReadAllLines("leaderboard.txt");
+                foreach (var line in leaderboard)
+                {
+                    Console.WriteLine(line.Replace("|", ": "));
+                }
             }
         }
-        Console.WriteLine(); // New line after each row
+        else if (map.currentHunter.Levelup)
+        {
+            map.currentHunter.Levelup = false;
+            level++;
+            map.LoadMap(mapChosen, monsters, name);
+            monFreezeTime -= 100;
+        }
     }
+
+    monsterMovementThread.Join();
+    playerMovementThread.Join();
+    Console.WriteLine("Game Over!");
 }
-
-Console.WriteLine("Enter your name: ");
-String name = Console.ReadLine();
-
-while (name == "" || name.Length > 19)
+catch (Exception ex)
 {
-    Console.WriteLine("Invalid name, try again");
-    Console.WriteLine("Enter your name: ");
-    name = Console.ReadLine();
+    Console.WriteLine($"Critical error: {ex.Message}");
 }
-
-Map map = new Map();
-Monsters monsters = new Monsters();
-String mapChosen = Console.ReadLine();
-
-while (!map.AvailableMaps.Contains(mapChosen))
-{
-    Console.WriteLine("Map doesn't exist");
-    mapChosen = Console.ReadLine();
-}
-
-map.LoadMap(mapChosen, monsters, name);
-
-
-
-// Start monster movement in a new thread
-Thread monsterMovementThread = new Thread(() => StartMonsterMovement(map, monsters));
-Thread playerMovementThread = new Thread(() => StartPlayerMovement(map, map.currentHunter));
-
-// Start both threads
-monsterMovementThread.Start();
-playerMovementThread.Start();
-
-
-while (!GameOver)
-{
-    int newX = map.currentHunter.X;
-    int newY = map.currentHunter.Y;
-    // Ensure game loop updates regularly without blocking
-    Thread.Sleep(map.currentHunter.FreezeTime); // Adjust the delay for game loop refresh rate
-
-    // Clear the console before drawing the new state
-    Console.Clear();
-
-    // Display the map and current game state
-    Console.WriteLine("=============================================");
-    DisplayMap(map, map.currentHunter, monsters);
-    Console.WriteLine("=============================================");
-    Console.WriteLine($"Player: {name}             Map: {mapChosen}.map\n" +
-                      $"HP:{map.currentHunter.CurrentHP}             Level: {level}\n" +
-                      $"Score: {map.currentHunter.Score}             ");
-    Console.WriteLine("=============================================");
-    Console.WriteLine("Infos:");
-    Console.WriteLine($"{map.info[map.info.Count - 1]}\n" +
-        $"{map.info[map.info.Count - 2]}\n" +
-        $"{map.info[map.info.Count - 3]}");
-    
-    Console.WriteLine("=============================================");
-    if (map.currentHunter.IsDead())
-    {
-        GameOver = true;
-    }
-    
-}
-
-// Wait for the player and monster movement threads to finish before ending the game
-monsterMovementThread.Join();
-playerMovementThread.Join();
-Console.WriteLine("Game Over!");
 
 
 

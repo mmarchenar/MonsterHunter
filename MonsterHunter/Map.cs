@@ -77,9 +77,17 @@ namespace MonsterHunter  // Define a namespace for the MonsterHunter project
                     // Find initial position of the hunter represented by 'H'
                     if (MapData[y, x] == 'H')
                     {
-                        currentHunter = new Hunter(x, y, name, this);  // Create a new Hunter instance at position (x, y)
-                        this.currentHunter = currentHunter;
-                        MapData[y, x] = ' ';  // Remove hunter from map representation by replacing with space character
+                        if (currentHunter == null)
+                        {
+                            currentHunter = new Hunter(x, y, name, this);  // Create a new Hunter instance at position (x, y)
+                            this.currentHunter = currentHunter;
+                            MapData[y, x] = ' ';  // Remove hunter from map representation by replacing with space character
+                        } else
+                        {
+                            currentHunter.X = x;
+                            currentHunter.Y = y;
+                            MapData[y, x] = ' ';
+                        }
                     }
 
                     // Add monsters represented by 'M'

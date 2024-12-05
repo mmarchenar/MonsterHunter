@@ -22,7 +22,7 @@ namespace MonsterHunter
         public Shield shieldH { get; set; }   // Hunter's shield (if any)
         public bool isInvisible { get; set; }    // Whether the Hunter is invisible
         public Map currentMap { get; set; }    // The current map where the Hunter is located
-
+        public bool Levelup { get; set; } // To check if the hunter reached the goal
         // Constructor for initializing the Hunter with position, name, and map
         public Hunter(int x, int y, string name, Map map) : base(x, y)
         {
@@ -40,6 +40,7 @@ namespace MonsterHunter
             Armor = 4;  // Default armor of the Hunter
             FreezeTime = 1000;  // Default freeze time of 1 second
             State = new NormalState();  // The Hunter starts in a normal state
+            Levelup = false;
         }
 
         // Method to move the Hunter to a new position, and interact with items/monsters on the way
@@ -89,6 +90,13 @@ namespace MonsterHunter
             {
                 AddToInventory(map.MapData[newX, newY], map);
                 map.MapData[newX, newY] = ' ';
+            } else if (map.MapData[newX,newY] == 'G')
+            {
+                map.info.Add("You reached the goal!! Level Up!");
+                this.FreezeTime -= 50;
+                this.CurrentHP += (int)((this.MaxHP - this.CurrentHP) / 2);
+                this.Levelup = true;
+                this.Score += 500;
             }
             // Otherwise, simply move to the new position
             else if (map.MapData[newX, newY] == ' ')
@@ -97,7 +105,7 @@ namespace MonsterHunter
                 this.Y = newY;
 
                 return true;
-            }
+            } 
             return false;
         }
 
